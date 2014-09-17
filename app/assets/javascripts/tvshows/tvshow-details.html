@@ -1,0 +1,36 @@
+<h2>{{ tvShow.name }}</h2>
+<!--<img ng-if="tvShow.details.poster_path !== undefined"
+     ng-src="https://image.tmdb.org/t/p/w342/{{ tvShow.details.poster_path }}"/>
+<br/>-->
+
+<img ng-if="tvShow.details.backdrop_path !== undefined"
+     ng-src="/images/w780{{ tvShow.details.backdrop_path }}"/>
+
+<div>{{ tvShow.details.overview }}</div>
+
+
+<h3>Seasons</h3>
+<div class="row">
+    <div class="col-md-8">
+        <div class="panel-group" id="seasons">
+            <div class="panel panel-default" ng-repeat="season in tvShow.details.seasons" ng-show="season.hasEpisodes">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#seasons" href="#episodes{{ season.season_number}}"
+                           class="collapsed">
+                            Season {{ season.season_number }}
+                        </a>
+                    </h4>
+                </div>
+                <div id="episodes{{ season.season_number}}" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div ng-repeat="ep in episodes[season.season_number]">
+                            {{ ep.name }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,11 @@
+<div class="page-header">
+  <h1>Movies</h1>
+</div>
+
+
+        <div>
+            <div ng-repeat="movie in movies">
+                {{ movie.name }}
+                <img src="/images/w185/{{ movie.details.poster_path }}" />
+            </div>
+        </div>

@@ -1,0 +1,18 @@
+<h1>Filme</h1>
+
+<div class="row" ng-repeat="row in movies">
+
+    <div ng-repeat="movie in row" class="col-md-3">
+        <div class="thumbnail">
+            <a href="#/movies/{{ movie.name }}">
+                <img ng-if="movie.details.poster_path !== undefined"
+                     ng-src="/images/w185/{{ movie.details.poster_path }}"/>
+                <img ng-if="movie.details.poster_path === undefined" src="/assets/images/blank_cover.png"/>
+            </a>
+
+            <div class="caption">{{ movie.name }}</div>
+        </div>
+
+    </div>
+
+</div>

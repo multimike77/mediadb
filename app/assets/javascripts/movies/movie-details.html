@@ -1,0 +1,23 @@
+<ol class="breadcrumb">
+    <li><a href="/#">Home</a></li>
+    <li><a href="/#/movies">Filme</a></li>
+    <li class="active">{{ movie.name}}</li>
+</ol>
+
+<div class="row">
+    <div class="col-md-4">
+        <img ng-if="movie.details.poster_path !== undefined"
+             ng-src="/images/w342/{{ movie.details.poster_path }}"/>
+    </div>
+    <div class="col-md-8">
+        <h3>{{ movie.name}}</h3>
+        <div>Veröffentlichung: {{ movie.details.release_date | date: "dd.MM.yyyy" }}</div>
+        <div>Bewertung: {{ movie.details.vote_average }}</div>
+        <div>Genres:
+            <span ng-repeat="genre in movie.details.genres">{{ genre.name }} {{ !$last ? ' / ' : ''}}</span>
+        </div>
+        <div>Laufzeit: {{movie.details.runtime}} Minuten</div>
+    </div>
+</div>
+
+<div>{{ movie.details.overview}}</div>

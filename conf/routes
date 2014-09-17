@@ -1,0 +1,46 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET           /                             controllers.Application.index
+
+# JavaScript routes object
+GET           /jsroutes.js                  controllers.Application.jsRoutes()
+
+# Routes used by Angular
+# ~~~~
+
+# Authentication
+POST          /login                        controllers.Application.login()
+POST          /logout                       controllers.Application.logout()
+
+# Users
+GET           /users/:id                    controllers.Users.user(id: Long)
+POST          /users                        controllers.Users.createUser()
+PUT           /users/:id                    controllers.Users.updateUser(id: Long)
+DELETE        /users/:id                    controllers.Users.deleteUser(id: Long)
+GET           /authuser                     controllers.Users.authUser()
+
+# Static
+# ~~~~
+
+# Map static resources from the /public folder to the /assets URL path
+GET           /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
+
+
+GET           /movies/search                @controllers.Movies.searchMovie
+GET           /movies/sync                  @controllers.Movies.syncDbWithFiles
+GET           /movies/status                @controllers.Movies.showMovieStatus
+GET           /movies/fetchDetails          @controllers.Movies.fetchMovieDetails
+GET           /movies/updateConfig          @controllers.Movies.updateTmdbConfiguration()
+GET           /movies/list                  @controllers.Movies.listMovies
+GET           /movies/details/:name         @controllers.Movies.loadMovieDetails(name: String)
+
+GET           /images/*path                 @controllers.Images.loadImage(path: String)
+
+GET           /tv/sync                      @controllers.TVShows.syncDbWithFiles
+GET           /tv/fetchDetails              @controllers.TVShows.fetchShowDetails
+GET           /tv/list                      @controllers.TVShows.listTVShows
+GET           /tv/show/:name                @controllers.TVShows.tvShowDetails(name: String)
+GET           /tv/show/:name/:season        @controllers.TVShows.listEpisodes(name: String, season: Int)
