@@ -1,13 +1,17 @@
+<!--
 <ol class="breadcrumb">
     <li><a href="/#">Home</a></li>
     <li><a href="/#/movies">Filme</a></li>
     <li class="active">{{ movie.name}}</li>
 </ol>
-
-<div class="row">
+-->
+<div class="row movie-details">
     <div class="col-md-4">
-        <img ng-if="movie.details.poster_path !== undefined"
+        <img ng-if="movie.details.poster_path !== undefined && movie.details.poster_path != null"
              ng-src="/images/w342/{{ movie.details.poster_path }}"/>
+
+        <img ng-if="movie.details.poster_path === undefined || movie.details.poster_path === null"
+             ng-src="/assets/images/movie-film-roll.jpg"/>
     </div>
     <div class="col-md-8">
         <h3>{{ movie.name}}</h3>
@@ -21,4 +25,4 @@
     </div>
 </div>
 
-<div class="movie-details">{{ movie.details.overview}}</div>
+<div class="movie-description">{{ movie.details.overview}}</div>

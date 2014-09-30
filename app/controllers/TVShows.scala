@@ -35,6 +35,7 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
   private def allShowsFromDB: Future[Seq[Movie]] = {
     collection.
       find(Json.obj()).
+      sort(Json.obj("name" -> 1)). // maybe do client side sorting later
       cursor[Movie].
       collect[Seq]()
   }
