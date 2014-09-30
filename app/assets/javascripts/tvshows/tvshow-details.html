@@ -13,18 +13,18 @@
 <div class="row">
     <div class="col-md-8">
         <div class="panel-group" id="seasons">
-            <div class="panel panel-default" ng-repeat="season in tvShow.details.seasons" ng-show="season.hasEpisodes">
+            <div class="panel panel-default" ng-repeat="season in seasons" ng-show="season.episodes.length > 0">
                 <div class="panel-heading">
                     <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#seasons" href="#episodes{{ season.season_number}}"
+                        <a data-toggle="collapse" data-parent="#seasons" href="#episodes-{{ season.season_number}}"
                            class="collapsed">
                             Season {{ season.season_number }}
                         </a>
                     </h4>
                 </div>
-                <div id="episodes{{ season.season_number}}" class="panel-collapse collapse">
+                <div id="episodes-{{ season.season_number}}" class="panel-collapse collapse">
                     <div class="panel-body">
-                        <div ng-repeat="ep in episodes[season.season_number]">
+                        <div ng-repeat="ep in season.episodes">
                             {{ ep.name }}
                         </div>
                     </div>

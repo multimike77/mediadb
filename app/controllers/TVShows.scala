@@ -2,12 +2,13 @@ package controllers
 
 import javax.inject.Inject
 
-import com.typesafe.config.{ConfigFactory, Config}
 import models.Movie
 import models.MovieFormats._
 import org.slf4j.{Logger, LoggerFactory}
+import play.api.Configuration
+import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.{JsNumber, Json}
+import play.api.libs.json._
 import play.api.mvc.{Action, Controller}
 import play.modules.reactivemongo.MongoController
 import play.modules.reactivemongo.json.collection.JSONCollection
@@ -23,11 +24,12 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
 
   private def collection: JSONCollection = db.collection[JSONCollection]("tvshows")
 
-  private val config: Config = ConfigFactory.load()
-  private val tvShowDir = config.getString("application.tvDir")
+  private val config: Configuration = current.configuration
+  private val tvShowDirs: Seq[String] = config.getStringSeq("application.tvSources")
+    .getOrElse(throw current.configuration.globalError("tvSources config not set"))
 
   private def allShowsFromDisk: Seq[Movie] = {
-    fs.getTVShowsFromDisk(tvShowDir)
+    tvShowDirs.flatMap(dir => fs.getTVShowsFromDisk(dir))
   }
 
   private def allShowsFromDB: Future[Seq[Movie]] = {
@@ -115,9 +117,33 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
     }
   }
 
-  def listEpisodes(tvShowName: String, seasonNumber: Int) = Action {
-    val path = tvShowDir + tvShowName
-    val episodes: Seq[Movie] = fs.getTVShowEpisodes(path, seasonNumber)
-    Ok(Json.toJson(episodes))
+/* old version
+  def listEpisodes(tvShowName: String, seasonNumber: Int) = Action { implicit request =>
+    request.getQueryString("fp") match {
+      case Some(path) =>
+        val episodes: Seq[Movie] = fs.getTVShowEpisodes(path, seasonNumber)
+        Ok(Json.toJson(episodes))
+      case None => NotFound
+    }
   }
+*/
+
+  def listEpisodes(tvShowName: String) = Action.async {
+    val fm: Future[Option[Movie]] = collection.find(Json.obj("name" -> tvShowName)).one
+    fm.map {
+      case Some(show) =>
+        val seasons: Seq[JsValue] = show.details \ "seasons" \\ "season_number"
+        val episodes: Seq[JsValue] = seasons.map(s =>
+          Json.obj(
+            "season_number" -> s,
+            "episodes" -> fs.getTVShowEpisodes(show.filePath, s.as[Int]))
+          )
+
+        Ok(Json.toJson(episodes))
+
+      case None => NotFound
+    }
+  }
+
+
 }

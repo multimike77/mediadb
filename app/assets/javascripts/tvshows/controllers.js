@@ -1,7 +1,7 @@
 /**
  * TV Show controllers.
  */
-define(['angular'], function (angular) {
+define([], function () {
     'use strict';
 
     /** Controls the tv shows page */
@@ -12,6 +12,7 @@ define(['angular'], function (angular) {
             $scope.tvshows = partitionArray(data, 4);
         });
     };
+
     TVShowCtrl.$inject = ['$scope', '$rootScope', '$location', 'helper', '$http'];
 
     var TVShowDetailsCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams) {
@@ -23,22 +24,13 @@ define(['angular'], function (angular) {
             console.log(data);
             $scope.tvShow = data;
 
-
-            var seasonEpisodes = [];
-            $scope.episodes = seasonEpisodes;
-            angular.forEach(data.details.seasons, function(value){
-                var seasonNumber = value.season_number;
-                var seasonPath = path + '/' + seasonNumber;
-                $http.get(seasonPath).success(function(episodes){
-                    $scope.tvShow.details.seasons[seasonNumber].hasEpisodes = episodes.length > 0;
-                    seasonEpisodes[seasonNumber] = episodes;
-                    console.log(seasonEpisodes);
-                });
+            $http.get(path + '/episodes').success(function(data) {
+                console.log(data);
+                $scope.seasons = data;
             });
         });
-
-
     };
+
     TVShowDetailsCtrl.$inject = ['$scope', '$rootScope', '$location', 'helper', '$http', '$routeParams'];
 
     function partitionArray(input, partitionSize) {

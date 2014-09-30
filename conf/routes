@@ -43,4 +43,4 @@ GET           /tv/sync                      @controllers.TVShows.syncDbWithFiles
 GET           /tv/fetchDetails              @controllers.TVShows.fetchShowDetails
 GET           /tv/list                      @controllers.TVShows.listTVShows
 GET           /tv/show/:name                @controllers.TVShows.tvShowDetails(name: String)
-GET           /tv/show/:name/:season        @controllers.TVShows.listEpisodes(name: String, season: Int)
+GET           /tv/show/:name/episodes       @controllers.TVShows.listEpisodes(name: String)
