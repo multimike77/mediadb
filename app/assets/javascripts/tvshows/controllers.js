@@ -9,7 +9,7 @@ define([], function () {
         $rootScope.pageTitle = 'Serien';
 
         $http.get('/tv/list').success(function (data) {
-            $scope.tvshows = partitionArray(data, 4);
+            $scope.tvshows = helper.partitionArray(data, 4);
         });
     };
 
@@ -32,14 +32,6 @@ define([], function () {
     };
 
     TVShowDetailsCtrl.$inject = ['$scope', '$rootScope', '$location', 'helper', '$http', '$routeParams'];
-
-    function partitionArray(input, partitionSize) {
-        var i, j, temparray = [];
-        for (i = 0, j = input.length; i < j; i += partitionSize) {
-            temparray.push(input.slice(i, i + partitionSize));
-        }
-        return temparray;
-    }
 
     return {
         TVShowCtrl: TVShowCtrl,
