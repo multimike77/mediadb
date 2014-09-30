@@ -1,7 +1,7 @@
 <h1>Serien</h1>
 <div class="row" ng-repeat="row in tvshows">
     <div ng-repeat="show in row" class="col-xs-6 col-md-3">
-        <div class="thumbnail">
+        <div class="thumbnail series">
             <a href="#/tv/{{ show.name }}">
             <img ng-if="show.details.poster_path !== undefined"
                  ng-src="/images/w185/{{ show.details.poster_path }}"/>
