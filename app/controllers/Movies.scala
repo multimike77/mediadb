@@ -55,9 +55,10 @@ class Movies @Inject()(fileService: FileService, mdb: MovieDBService) extends Co
     }
   }
 */
-private def allMoviesFromDisk: Seq[Movie] = {
-  movieSources.flatMap(dir => fileService.getMovieListFromDisk(dir, ".*\\.(mkv|mp4)$".r))
-}
+
+  private def allMoviesFromDisk: Seq[Movie] = {
+    movieSources.flatMap(dir => fileService.getMovieListFromDisk(dir, ".*\\.(mkv|mp4)$".r))
+  }
 
   private def allMoviesFromDB: Future[Seq[Movie]] = {
     collection.
@@ -84,6 +85,8 @@ private def allMoviesFromDisk: Seq[Movie] = {
     }
   }
 
+  /* ### Controller Actions ### */
+
   def showMovieStatus = Action.async {
     val futureUpdatedMovies: Future[MovieSyncResult] = findAllNewAndDeleted
     futureUpdatedMovies.map { um =>
@@ -98,9 +101,9 @@ private def allMoviesFromDisk: Seq[Movie] = {
 
   def syncDbWithFiles = Action.async {
     val futureSync: Future[MovieSyncResult] = findAllNewAndDeleted
-    futureSync.map {result =>
+    futureSync.map { result =>
       for (movie <- result.addedMovies) {
-        collection.insert(movie).map {lastError =>
+        collection.insert(movie).map { lastError =>
           val msg = "Success: " + lastError.ok.toString + " added: " + movie.name
           logger.info(msg)
           if (!lastError.ok) {
@@ -109,7 +112,7 @@ private def allMoviesFromDisk: Seq[Movie] = {
         }
       }
       for (movie <- result.deletedMovies) {
-        collection.remove(Json.obj("name" -> movie.name)).map {lastError =>
+        collection.remove(Json.obj("name" -> movie.name)).map { lastError =>
           val msg = "Success: " + lastError.ok.toString + " deleted: " + movie.name
           logger.info(msg)
         }
@@ -118,11 +121,11 @@ private def allMoviesFromDisk: Seq[Movie] = {
     }
   }
 
-  def fetchMovieDetails = Action.async {
+  def loadMissingMovieDetails = Action.async {
     val toBeUpdated: Future[Seq[Movie]] = moviesWithoutDetails
-    toBeUpdated.map {movies =>
+    toBeUpdated.map { movies =>
       for (movie <- movies) {
-        mdb.searchMovie(movie.name).map {searchRes =>
+        mdb.searchMovie(movie.name).map { searchRes =>
           logger.info(movie.name + searchRes.toString())
           //TODO handle selection for multiple results
           val movieId = (searchRes \ "results")(0) \ "id"
@@ -130,7 +133,7 @@ private def allMoviesFromDisk: Seq[Movie] = {
             mdb.loadMovieDetails(movieId.as[Int], "de").map { movieDetails =>
               val oid = Json.obj("_id" -> Json.obj("$oid" -> movie.id))
               val details = Json.obj("$set" -> Json.obj("details" -> movieDetails))
-              collection.update(oid, details).map {lastError =>
+              collection.update(oid, details).map { lastError =>
                 val msg = "Success: " + lastError.ok.toString + " updated: " + movie.name
                 logger.info(msg)
               }
@@ -142,15 +145,41 @@ private def allMoviesFromDisk: Seq[Movie] = {
     }
   }
 
+  
+  def loadMovieDetails(name: String) = Action.async {
+    val fm: Future[Option[Movie]] = collection.find(Json.obj("name" -> name)).one
+
+    fm.map {
+      case Some(show) => Ok(Json.toJson(show))
+      case None => NotFound(Json.obj("error" -> "not found"))
+    }
+  }
+
+  def updateDetails(id: String) = Action.async { request =>
+    request.getQueryString("tmdbid") match {
+      case None => Future {BadRequest("tmdbId not specified")}
+      case Some(tmdbId) =>
+        mdb.loadMovieDetails(tmdbId.toInt, "de").map { md =>
+          val oid = Json.obj("_id" -> Json.obj("$oid" -> id))
+          val details = Json.obj("$set" -> Json.obj("details" -> md))
+          collection.update(oid, details).map { lastError =>
+            val msg = "Success: " + lastError.ok.toString + " updated: " + id
+            logger.info(msg)
+          }
+          Ok(details)
+        }
+    }
+  }
+
   def updateTmdbConfiguration() = Action.async {
-    mdb.getConfiguration.flatMap{config =>
+    mdb.getConfiguration.flatMap { config =>
       val configCollection = db.collection[JSONCollection]("config")
       val storeConfig = Json.obj("tmdb" -> config)
-      configCollection.save(storeConfig).map{lastError =>
-        if(lastError.ok) {
+      configCollection.save(storeConfig).map { lastError =>
+        if (lastError.ok) {
           Ok(Json.obj("success" -> true))
         } else {
-           InternalServerError(Json.obj("success" -> false, "error" -> lastError.errMsg))
+          InternalServerError(Json.obj("success" -> false, "error" -> lastError.errMsg))
         }
       }
     }
@@ -161,26 +190,5 @@ private def allMoviesFromDisk: Seq[Movie] = {
       Ok(Json.toJson(movies))
     }
   }
-
-  // temp stuff
-
-  def searchMovie = Action.async {
-    //MovieDBService.searchMovie("R.E.D. 2 - Noch Älter Härter Besser").map(res => Ok(res))
-    collection.find(Json.obj("_id" -> Json.obj("$oid" -> "53a448d30610250ee5adaf4b"))).cursor[Movie].collect[List]()
-      .map {
-      movies =>
-        Ok(Json.arr(movies))
-    }
-  }
-
-  def loadMovieDetails(name: String) = Action.async {
-    val fm: Future[Option[Movie]] = collection.find(Json.obj("name" -> name)).one
-
-    fm.map {
-      case Some(show) => Ok(Json.toJson(show))
-      case None => NotFound(Json.obj("error" -> "not found"))
-    }
-  }
-
 
 }
