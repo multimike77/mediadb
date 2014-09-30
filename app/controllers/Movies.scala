@@ -2,16 +2,17 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import com.typesafe.config.{ConfigFactory, Config}
 import models.Movie
 import models.MovieFormats._
 import org.slf4j.{Logger, LoggerFactory}
+import play.api.Configuration
+import play.api.Play._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc._
 import play.modules.reactivemongo.MongoController
 import play.modules.reactivemongo.json.collection.JSONCollection
-import services.{MovieDBService, FileService}
+import services.{FileService, MovieDBService}
 
 import scala.concurrent.Future
 
@@ -21,9 +22,12 @@ class Movies @Inject()(fileService: FileService, mdb: MovieDBService) extends Co
 
   private def collection: JSONCollection = db.collection[JSONCollection]("movies")
 
-  private val config: Config = ConfigFactory.load()
+  private val config: Configuration = current.configuration
+  private val movieSources: Seq[String] = config.getStringSeq("application.movieSources")
+    .getOrElse(throw current.configuration.globalError("movieSources config not set"))
 
-/*
+
+  /*
   def listNewMovies = Action.async {
     findNewMovies.map { movies => Ok(Json.toJson(movies))}
   }
@@ -52,8 +56,7 @@ class Movies @Inject()(fileService: FileService, mdb: MovieDBService) extends Co
   }
 */
 private def allMoviesFromDisk: Seq[Movie] = {
-  val movieDir = config.getString("application.movieDir")
-  fileService.getMovieListFromDisk(movieDir, ".*\\.(mkv|mp4)$".r)
+  movieSources.flatMap(dir => fileService.getMovieListFromDisk(dir, ".*\\.(mkv|mp4)$".r))
 }
 
   private def allMoviesFromDB: Future[Seq[Movie]] = {
