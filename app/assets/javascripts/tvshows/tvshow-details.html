@@ -3,10 +3,13 @@
      ng-src="https://image.tmdb.org/t/p/w342/{{ tvShow.details.poster_path }}"/>
 <br/>-->
 
-<img ng-if="tvShow.details.backdrop_path !== undefined"
+<img ng-if="tvShow.details.backdrop_path !== undefined && tvShow.details.backdrop_path != null"
      ng-src="/images/w780{{ tvShow.details.backdrop_path }}"/>
 
-<div>{{ tvShow.details.overview }}</div>
+<img ng-if="tvShow.details.backdrop_path === undefined || tvShow.details.backdrop_path === null"
+     src="/assets/images/movie-film-roll.jpg" ng-cloak/>
+
+<div class="movie-description">{{ tvShow.details.overview }}</div>
 
 
 <h3>Seasons</h3>

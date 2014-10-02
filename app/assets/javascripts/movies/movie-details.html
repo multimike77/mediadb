@@ -11,7 +11,7 @@
              ng-src="/images/w342/{{ movie.details.poster_path }}"/>
 
         <img ng-if="movie.details.poster_path === undefined || movie.details.poster_path === null"
-             ng-src="/assets/images/movie-film-roll.jpg"/>
+             src="/assets/images/movie-film-roll.jpg" ng-cloak/>
     </div>
     <div class="col-md-8">
         <h3>{{ movie.name}}</h3>

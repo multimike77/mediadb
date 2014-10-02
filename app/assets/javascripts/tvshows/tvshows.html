@@ -3,8 +3,10 @@
     <div ng-repeat="show in row" class="col-xs-6 col-md-3">
         <div class="thumbnail series">
             <a href="#/tv/{{ show.name }}">
-            <img ng-if="show.details.poster_path !== undefined"
+            <img ng-if="show.details.poster_path !== undefined && show.details.poster_path != null"
                  ng-src="/images/w185/{{ show.details.poster_path }}"/>
+            <img ng-if="show.details.poster_path === undefined || show.details.poster_path == null"
+                 src="/assets/images/blank_cover.png" class="movie-placeholder"/>
             </a>
         </div>
     </div>
