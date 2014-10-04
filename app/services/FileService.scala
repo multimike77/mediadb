@@ -15,7 +15,7 @@ class FileService {
   private def recursiveListFiles(dir: File, pattern: Regex): Array[File] = {
     val files = dir.listFiles
     val good = files.filter(f => pattern.findFirstIn(f.getName).isDefined)
-    good ++ files.filter(_.isDirectory).flatMap(recursiveListFiles(_, pattern))
+    good ++ files.filter(f => f.isDirectory && !f.isHidden).flatMap(recursiveListFiles(_, pattern))
   }
 
   private def filesToMovieList(files: Array[File]): Seq[Movie] = {
@@ -37,7 +37,7 @@ class FileService {
   }
 
   private def getAllSubDirectories(parentDir: File): Array[File] = {
-    parentDir.listFiles.filter(f => f.isDirectory)
+    parentDir.listFiles.filter(f => f.isDirectory && !f.isHidden)
   }
 
   def getTVShowsFromDisk(path: String): Seq[Movie] = {
