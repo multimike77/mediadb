@@ -1,7 +1,7 @@
 /**
  * TV Show controllers.
  */
-define([], function () {
+define(['angular'], function (angular) {
     'use strict';
 
     /** Controls the tv shows page */
@@ -25,6 +25,12 @@ define([], function () {
             $scope.tvShow = data;
 
             $http.get(path + '/episodes').success(function(data) {
+                angular.forEach(data, function(season) {
+                    angular.forEach(season.episodes, function(episode) {
+                        episode.filePath = helper.getDownloadPath(episode.filePath);
+                    });
+                });
+
                 console.log(data);
                 $scope.seasons = data;
             });

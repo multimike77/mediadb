@@ -28,7 +28,7 @@
                 <div id="episodes-{{ season.season_number}}" class="panel-collapse collapse">
                     <div class="panel-body">
                         <div ng-repeat="ep in season.episodes">
-                            {{ ep.name }}
+                            <a ng-href="{{ ep.filePath }}">{{ ep.name }}</a>
                         </div>
                     </div>
                 </div>

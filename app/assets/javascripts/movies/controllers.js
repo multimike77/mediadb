@@ -20,6 +20,7 @@ define([], function () {
         var path = '/movies/details/' + movieName;
 
         $http.get(path).success(function (data) {
+            data.filePath = helper.getDownloadPath(data.filePath);
             console.log(data);
             $scope.movie = data;
         });

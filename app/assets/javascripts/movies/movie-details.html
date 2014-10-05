@@ -22,6 +22,12 @@
             <span ng-repeat="genre in movie.details.genres">{{ genre.name }} {{ !$last ? ' / ' : ''}}</span>
         </div>
         <div>Laufzeit: {{movie.details.runtime}} Minuten</div>
+        <div class="download">
+            <a class="btn btn-default" ng-href="{{ movie.filePath }}">
+                <span class="glyphicon glyphicon-download-alt"></span>
+                Download
+            </a>
+        </div>
     </div>
 </div>
 
