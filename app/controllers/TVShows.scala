@@ -80,7 +80,7 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
     }
   }
 
-  def fetchShowDetails = Action.async {
+  def loadMissingShowDetails = Action.async {
     val toBeUpdated: Future[Seq[Movie]] = showsWithoutDetails
     toBeUpdated.map { shows =>
       for (show <- shows) {
@@ -137,8 +137,9 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
         val episodes: Seq[JsValue] = seasons.map(s =>
           Json.obj(
             "season_number" -> s,
-            "episodes" -> fs.getTVShowEpisodes(show.filePath, s.as[Int]))
+            "episodes" -> fs.getTVShowEpisodes(show.filePath, s.as[Int]).sortBy(_.name)
           )
+        )
 
         Ok(Json.toJson(episodes))
 
@@ -146,5 +147,22 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
     }
   }
 
+  def updateDetails(id: String) = Action.async { request =>
+    request.getQueryString("tmdbid") match {
+      case None => Future {
+        BadRequest("tmdbId not specified")
+      }
+      case Some(tmdbId) =>
+        mdb.loadTVShowDetails(tmdbId.toInt, "en").map { md =>
+          val oid = Json.obj("_id" -> Json.obj("$oid" -> id))
+          val details = Json.obj("$set" -> Json.obj("details" -> md))
+          collection.update(oid, details).map { lastError =>
+            val msg = "Success: " + lastError.ok.toString + " updated: " + id
+            logger.info(msg)
+          }
+          Ok(details)
+        }
+    }
+  }
 
 }
