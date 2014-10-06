@@ -22,6 +22,7 @@ define(['angular'], function (angular) {
         $rootScope.pageTitle = 'Serien Details - ' + tvShowName;
         $http.get(path).success(function (data) {
             console.log(data);
+            data.details.status = getTVShowStatus(data.details.status);
             $scope.tvShow = data;
 
             $http.get(path + '/episodes').success(function(data) {
@@ -44,4 +45,12 @@ define(['angular'], function (angular) {
         TVShowDetailsCtrl: TVShowDetailsCtrl
     };
 
+    function getTVShowStatus(status) {
+        switch(status) {
+            case "Returning Series": return "Wiederkehrende Serie";
+            case "Canceled": return "Abgesetzt";
+            case "Ended": return "Beendet";
+            case "In Production": return "In Produktion";
+        }
+    }
 });

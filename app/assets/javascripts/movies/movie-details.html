@@ -14,14 +14,17 @@
              src="/assets/images/movie-film-roll.jpg" ng-cloak/>
     </div>
     <div class="col-md-8">
-        <h3>{{ movie.name}}</h3>
+        <h3>{{ movie.details.title || movie.name}}</h3>
 
-        <div>Veröffentlichung: {{ movie.details.release_date | date: "dd.MM.yyyy" }}</div>
-        <div>Bewertung: {{ movie.details.vote_average }}</div>
-        <div>Genres:
+        <div class="movie-description">{{ movie.details.overview}}</div>
+        <div><span class="movie-info">Veröffentlichung:</span>
+            {{ movie.details.release_date | date: "dd.MM.yyyy" }}</div>
+        <div><span class="movie-info">Laufzeit:</span> {{movie.details.runtime}} Minuten</div>
+        <div><span class="movie-info">Bewertung:</span>
+            {{ movie.details.vote_average }} / 10 ({{ movie.details.vote_count }} Stimmen)</div>
+        <div><span class="movie-info">Genres:</span>
             <span ng-repeat="genre in movie.details.genres">{{ genre.name }} {{ !$last ? ' / ' : ''}}</span>
         </div>
-        <div>Laufzeit: {{movie.details.runtime}} Minuten</div>
         <div class="download">
             <a class="btn btn-default" ng-href="{{ movie.filePath }}">
                 <span class="glyphicon glyphicon-download-alt"></span>
@@ -31,4 +34,3 @@
     </div>
 </div>
 
-<div class="movie-description">{{ movie.details.overview}}</div>

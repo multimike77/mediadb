@@ -1,15 +1,30 @@
-<h2>{{ tvShow.name }}</h2>
-<!--<img ng-if="tvShow.details.poster_path !== undefined"
-     ng-src="https://image.tmdb.org/t/p/w342/{{ tvShow.details.poster_path }}"/>
-<br/>-->
+<div class="row movie-details">
+    <div class="col-md-4">
+        <img ng-if="tvShow.details.poster_path !== undefined && tvShow.details.poster_path != null"
+             ng-src="/images/w342{{ tvShow.details.poster_path }}"/>
 
-<img ng-if="tvShow.details.backdrop_path !== undefined && tvShow.details.backdrop_path != null"
-     ng-src="/images/w780{{ tvShow.details.backdrop_path }}"/>
+        <img ng-if="tvShow.details.poster_path === undefined || tvShow.details.poster_path === null"
+             src="/assets/images/movie-film-roll.jpg" ng-cloak/>
+    </div>
+    <div class="col-md-8">
+        <h3>{{ tvShow.details.name }}</h3>
+        <div class="movie-description">{{ tvShow.details.overview }}</div>
+        <div>
+            <span class="movie-info">Erste Ausstrahlung:</span>
+            {{ tvShow.details.first_air_date | date: "dd.MM.yyyy"}}
+        </div>
+        <div><span class="movie-info">Letzte Ausstrahlung:</span> {{ tvShow.details.last_air_date | date: "dd.MM.yyyy" }}</div>
+        <div><span class="movie-info">Status:</span> {{ tvShow.details.status}}</div>
+        <div><span class="movie-info">Bewertung:</span>
+            {{ tvShow.details.vote_average }} / 10 ({{ tvShow.details.vote_count }} Stimmen)
+        </div>
+        <div><span class="movie-info">Genres:</span>
+            <span ng-repeat="genre in tvShow.details.genres">{{ genre.name }} {{ !$last ? ' / ' : ''}}</span>
+        </div>
 
-<img ng-if="tvShow.details.backdrop_path === undefined || tvShow.details.backdrop_path === null"
-     src="/assets/images/movie-film-roll.jpg" ng-cloak/>
+    </div>
+</div>
 
-<div class="movie-description">{{ tvShow.details.overview }}</div>
 
 
 <h3>Seasons</h3>
