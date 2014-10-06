@@ -4,7 +4,7 @@
 
     <div ng-repeat="movie in row" class="col-md-3">
         <div class="thumbnail movie">
-            <a href="#/movies/{{ movie.name }}">
+            <a href="/movies/{{ movie.name }}">
                 <img ng-if="movie.details.poster_path !== undefined && movie.details.poster_path != null"
                      ng-src="/images/w185/{{ movie.details.poster_path }}"/>
                 <img ng-if="movie.details.poster_path === undefined || movie.details.poster_path == null"

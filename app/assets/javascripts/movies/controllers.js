@@ -8,7 +8,7 @@ define([], function () {
     var MovieCtrl = function ($scope, $rootScope, $location, helper, $http) {
         $rootScope.pageTitle = 'Filme';
 
-        $http.get('/movies/list').success(function (data) {
+        $http.get('/api/movies/list').success(function (data) {
             $scope.movies = helper.partitionArray(data, 4);
         });
     };
@@ -17,7 +17,7 @@ define([], function () {
     var MovieDetailsCtrl = function ($scope, $rootScope, $location, helper, $http, $routeParams) {
         var movieName = $routeParams.movieName;
         $rootScope.pageTitle = 'Filme - ' + movieName;
-        var path = '/movies/details/' + movieName;
+        var path = '/api/movies/details/' + movieName;
 
         $http.get(path).success(function (data) {
             data.filePath = helper.getDownloadPath(data.filePath);

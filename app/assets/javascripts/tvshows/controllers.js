@@ -8,7 +8,7 @@ define(['angular'], function (angular) {
     var TVShowCtrl = function ($scope, $rootScope, $location, helper, $http) {
         $rootScope.pageTitle = 'Serien';
 
-        $http.get('/tv/list').success(function (data) {
+        $http.get('/api/tv/list').success(function (data) {
             $scope.tvshows = helper.partitionArray(data, 4);
         });
     };
@@ -17,7 +17,7 @@ define(['angular'], function (angular) {
 
     var TVShowDetailsCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams) {
         var tvShowName = $routeParams.showName;
-        var path = '/tv/show/' + tvShowName;
+        var path = '/api/tv/show/' + tvShowName;
 
         $rootScope.pageTitle = 'Serien Details - ' + tvShowName;
         $http.get(path).success(function (data) {

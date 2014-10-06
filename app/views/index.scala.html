@@ -14,10 +14,10 @@
     <header class="navbar navbar-inverse navbar-fixed-top basics-nav" data-ng-controller="HeaderCtrl"
         data-ng-cloak>
       <div class="container" data-ng-switch="!!user" data-ng-cloak>
-        <a href="/#/" class="navbar-brand">Media DB</a>
+        <a href="/" class="navbar-brand">Media DB</a>
           <ul class="nav navbar-nav">
-            <li><a href="/#/movies">Filme</a></li>
-              <li><a href="/#/tv">Serien</a></li>
+            <li><a href="/movies">Filme</a></li>
+              <li><a href="/tv">Serien</a></li>
           </ul>
         <div data-ng-switch-when="true">
           <ul class="nav navbar-nav navbar-right">
@@ -27,7 +27,7 @@
                 <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
-                <li><a href="#/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                <li><a href="/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
                 <li>
                   <a href="" data-ng-click="logout()">
                     <span class="glyphicon glyphicon-off"></span> Logout

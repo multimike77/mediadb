@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET           /                                        controllers.Application.index
+GET           /                                        controllers.Application.index(any = "")
 
 # JavaScript routes object
 GET           /jsroutes.js                             controllers.Application.jsRoutes()
@@ -28,22 +28,26 @@ GET           /authuser                                controllers.Users.authUse
 # Map static resources from the /public folder to the /assets URL path
 GET           /assets/*file                            controllers.Assets.versioned(path="/public", file: Asset)
 
-
-GET           /movies/sync                             @controllers.Movies.syncDbWithFiles
-GET           /movies/status                           @controllers.Movies.showMovieStatus
-GET           /movies/loadMissingDetails               @controllers.Movies.loadMissingMovieDetails
-GET           /movies/updateDetails/:id                @controllers.Movies.updateDetails(id: String)
-GET           /movies/updateConfig                     @controllers.Movies.updateTmdbConfiguration()
-GET           /movies/list                             @controllers.Movies.listMovies
-GET           /movies/details/:name                    @controllers.Movies.loadMovieDetails(name: String)
-
+# Serving images and file downloads
 GET           /images/*path                            @controllers.Images.loadImage(path: String)
-
-GET           /tv/sync                                 @controllers.TVShows.syncDbWithFiles
-GET           /tv/loadMissingDetails                   @controllers.TVShows.loadMissingShowDetails
-GET           /tv/updateDetails/:id                    @controllers.TVShows.updateDetails(id: String)
-GET           /tv/list                                 @controllers.TVShows.listTVShows
-GET           /tv/show/:name                           @controllers.TVShows.tvShowDetails(name: String)
-GET           /tv/show/:name/episodes                  @controllers.TVShows.listEpisodes(name: String)
-
 GET           /download/$diskNr<[12]>/*filePath        @controllers.Downloads.downloadFile(diskNr: Int, filePath)
+
+# Movies REST API
+GET           /api/movies/sync                         @controllers.Movies.syncDbWithFiles
+GET           /api/movies/status                       @controllers.Movies.showMovieStatus
+GET           /api/movies/loadMissingDetails           @controllers.Movies.loadMissingMovieDetails
+GET           /api/movies/updateDetails/:id            @controllers.Movies.updateDetails(id: String)
+GET           /api/movies/updateConfig                 @controllers.Movies.updateTmdbConfiguration()
+GET           /api/movies/list                         @controllers.Movies.listMovies
+GET           /api/movies/details/:name                @controllers.Movies.loadMovieDetails(name: String)
+
+# TVShows REST API
+GET           /api/tv/sync                             @controllers.TVShows.syncDbWithFiles
+GET           /api/tv/loadMissingDetails               @controllers.TVShows.loadMissingShowDetails
+GET           /api/tv/updateDetails/:id                @controllers.TVShows.updateDetails(id: String)
+GET           /api/tv/list                             @controllers.TVShows.listTVShows
+GET           /api/tv/show/:name                       @controllers.TVShows.tvShowDetails(name: String)
+GET           /api/tv/show/:name/episodes              @controllers.TVShows.listEpisodes(name: String)
+
+# fallback route to angular main page
+GET           /*any                                    controllers.Application.index(any)
