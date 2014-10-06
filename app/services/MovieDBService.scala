@@ -34,8 +34,15 @@ class MovieDBService {
   //Movies
   def searchMovie(name: String): Future[JsValue] = {
     val url = baseUrl + "search/movie"
-    val encodedName: String = UriEncoding.encodePathSegment(name, "UTF-8")
-    val holder: WSRequestHolder = WS.url(url).withQueryString(apiKeyParam -> apiKey, "query" -> encodedName)
+    val nameAndYear: (String, Option[String]) = extractNameAndYear(name)
+    val encodedName: String = UriEncoding.encodePathSegment(nameAndYear._1, "UTF-8")
+    val baseParams: Seq[(String, String)] = Seq(apiKeyParam -> apiKey, "query" -> encodedName)
+
+    val params: Seq[(String, String)] = nameAndYear._2 match {
+      case Some(y) => baseParams :+ "year" -> y
+      case None => baseParams
+    }
+    val holder: WSRequestHolder = WS.url(url).withQueryString(params:_*)
 
     holder.get().map { response => response.json}
   }
@@ -50,10 +57,17 @@ class MovieDBService {
   //TV Shows
   def searchTVShow(name: String): Future[JsValue] = {
     val url = baseUrl + "search/tv"
-    val encodedName = UriEncoding.encodePathSegment(name, "UTF-8")
-    val request = WS.url(url).withQueryString(apiKeyParam -> apiKey, "query" -> encodedName)
+    val nameAndYear: (String, Option[String]) = extractNameAndYear(name)
+    val encodedName: String = UriEncoding.encodePathSegment(nameAndYear._1, "UTF-8")
+    val baseParams: Seq[(String, String)] = Seq(apiKeyParam -> apiKey, "query" -> encodedName)
 
-    request.get().map { response => response.json}
+    val params: Seq[(String, String)] = nameAndYear._2 match {
+      case Some(y) => baseParams :+ "first_air_date_year" -> y
+      case None => baseParams
+    }
+    val holder: WSRequestHolder = WS.url(url).withQueryString(params: _*)
+
+    holder.get().map { response => response.json}
   }
 
   def loadTVShowDetails(id: Int, lang: String): Future[JsValue] = {
@@ -107,6 +121,14 @@ class MovieDBService {
       }
     }
 
+  }
+
+  private def extractNameAndYear(name: String): (String, Option[String]) = {
+    val pattern = """(.+)\((\d{4})\)""".r
+    pattern.findFirstMatchIn(name) match {
+      case Some(m) => (m.group(1).trim.replaceAll("_", " "), Some(m.group(2)))
+      case None => (name.replaceAll("_", " "), None)
+    }
   }
 
 }
