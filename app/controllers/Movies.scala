@@ -57,13 +57,12 @@ class Movies @Inject()(fileService: FileService, mdb: MovieDBService) extends Co
 */
 
   private def allMoviesFromDisk: Seq[Movie] = {
-    movieSources.flatMap(dir => fileService.getMovieListFromDisk(dir, ".*\\.(mkv|mp4)$".r))
+    movieSources.flatMap(dir => fileService.getMovieListFromDisk(dir, ".*\\.(mkv|mp4|m4v|avi)$".r))
   }
 
   private def allMoviesFromDB: Future[Seq[Movie]] = {
     collection.
       find(Json.obj()).
-      sort(Json.obj("name" -> 1)). //maybe do client-side sorting later
       cursor[Movie].
       collect[Seq]()
   }

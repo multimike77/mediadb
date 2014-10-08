@@ -19,7 +19,8 @@ class FileService {
   }
 
   private def filesToMovieList(files: Array[File]): Seq[Movie] = {
-    val movies: Array[Movie] = files.map(file => new Movie(stripExtension(file.getName), file.getCanonicalPath))
+    val movies: Array[Movie] = files.map(file =>
+      new Movie(stripExtension(file.getName), file.getCanonicalPath, file.lastModified()))
     movies.toSeq
   }
 
@@ -48,7 +49,7 @@ class FileService {
   def getTVShowEpisodes(path: String, seasonNumber: Int): Seq[Movie] = {
     val tvShowDir = new File(path)
     val seasonPattern = ("Season[\\s]?" + seasonNumber.toString).r
-    val episodePattern = ".*\\.(mkv|mp4|avi)$".r
+    val episodePattern = ".*\\.(mkv|mp4|m4v|avi)$".r
     val seasonDir = getAllSubDirectories(tvShowDir).find(dir => seasonPattern.findFirstIn(dir.getName).isDefined)
 
     val episodes = seasonDir.map(recursiveListFiles(_, episodePattern)).map(filesToMovieList)

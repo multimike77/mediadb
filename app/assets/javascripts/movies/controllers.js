@@ -5,14 +5,25 @@ define([], function () {
     'use strict';
 
     /** Controls the movies page */
-    var MovieCtrl = function ($scope, $rootScope, $location, helper, $http) {
+    var MovieCtrl = function ($scope, $rootScope, $location, helper, $http, $filter) {
         $rootScope.pageTitle = 'Filme';
+        $scope.sorting = 'alpha';
+        var movies = [];
+        var orderBy = $filter('orderBy');
+
+        $scope.sortMovies = function() {
+            var sortField = $scope.sorting === 'alpha' ? 'details.title' : '-creationDate';
+            var sortedMovies = orderBy(movies, sortField, false);
+            console.log(sortedMovies);
+            $scope.movies = helper.partitionArray(sortedMovies, 4);
+        };
 
         $http.get('/api/movies/list').success(function (data) {
-            $scope.movies = helper.partitionArray(data, 4);
+            movies = data;
+            $scope.sortMovies();
         });
     };
-    MovieCtrl.$inject = ['$scope', '$rootScope', '$location', 'helper', '$http'];
+    MovieCtrl.$inject = ['$scope', '$rootScope', '$location', 'helper', '$http', '$filter'];
 
     var MovieDetailsCtrl = function ($scope, $rootScope, $location, helper, $http, $routeParams) {
         var movieName = $routeParams.movieName;

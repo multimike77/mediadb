@@ -8,9 +8,11 @@ case class Movie(
                   id: String,
                   name: String,
                   filePath: String,
+                  creationDate: Long,
                   details: JsValue = Json.obj()
                   ) {
-  def this(name: String, filePath: String) = this(BSONObjectID.generate.stringify, name, filePath)
+  def this(name: String, filePath: String, creationDate: Long) =
+    this(BSONObjectID.generate.stringify, name, filePath, creationDate)
 
   override def equals(that: Any): Boolean = {
     that.isInstanceOf[Movie] && (this.hashCode() == that.asInstanceOf[Movie].hashCode())

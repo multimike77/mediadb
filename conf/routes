@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET           /                                        controllers.Application.index(any = "")
+GET           /                                        controllers.Application.index(page = "")
 
 # JavaScript routes object
 GET           /jsroutes.js                             controllers.Application.jsRoutes()
@@ -50,4 +50,4 @@ GET           /api/tv/show/:name                       @controllers.TVShows.tvSh
 GET           /api/tv/show/:name/episodes              @controllers.TVShows.listEpisodes(name: String)
 
 # fallback route to angular main page
-GET           /*any                                    controllers.Application.index(any)
+GET           /*somePath                               controllers.Application.index(somePath: String)

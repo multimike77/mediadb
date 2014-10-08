@@ -13,7 +13,7 @@ import play.api.cache._
 object Application extends Controller with Security {
 
   /** Serves the index page, see views/index.scala.html */
-  def index(any: String) = Action {
+  def index(page: String) = Action {
     Ok(views.html.index())
   }
 
