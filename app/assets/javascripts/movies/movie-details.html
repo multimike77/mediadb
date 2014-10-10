@@ -26,7 +26,7 @@
             <span ng-repeat="genre in movie.details.genres">{{ genre.name }} {{ !$last ? ' / ' : ''}}</span>
         </div>
         <div class="download">
-            <a class="btn btn-default" ng-href="{{ movie.filePath }}">
+            <a class="btn btn-default" ng-href="{{ movie.filePath }}" target="_self">
                 <span class="glyphicon glyphicon-download-alt"></span>
                 Download
             </a>
