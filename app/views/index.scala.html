@@ -16,8 +16,8 @@
       <div class="container" data-ng-switch="!!user" data-ng-cloak>
         <a href="/" class="navbar-brand">Media DB</a>
           <ul class="nav navbar-nav">
-            <li><a href="/movies">Filme</a></li>
-              <li><a href="/tv">Serien</a></li>
+            <li ng-class="{active: isActive('/movies')}"><a href="/movies">Filme</a></li>
+              <li ng-class="{active: isActive('/tv')}"><a href="/tv">Serien</a></li>
           </ul>
         <div data-ng-switch-when="true">
           <ul class="nav navbar-nav navbar-right">

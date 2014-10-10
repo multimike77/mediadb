@@ -28,6 +28,10 @@ define([], function() {
       $scope.user = undefined;
       $location.path('/');
     };
+
+      $scope.isActive = function(viewLocation) {
+          return $location.path().indexOf(viewLocation) === 0;
+      };
   };
   HeaderCtrl.$inject = ['$scope', 'userService', 'helper', '$location'];
 
