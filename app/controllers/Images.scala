@@ -28,12 +28,12 @@ class Images extends Controller {
 
     if (image.exists() && image.length() > 0) {
       Future {
-        Ok.sendFile(content = image, inline = true)
+        Ok.sendFile(content = image, inline = true).withHeaders(CACHE_CONTROL -> "public, max-age=31536000")
       }
     } else {
       val futureImage: Future[File] = downloadImage(image, path)
       futureImage.map { img =>
-        Ok.sendFile(content = img, inline = true)
+        Ok.sendFile(content = img, inline = true).withHeaders(CACHE_CONTROL -> "public, max-age=31536000")
       }
     }
   }
