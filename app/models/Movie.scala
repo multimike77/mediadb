@@ -5,14 +5,15 @@ import reactivemongo.bson.BSONObjectID
 
 
 case class Movie(
-                  id: String,
+                  id: String = BSONObjectID.generate.stringify,
                   name: String,
                   filePath: String,
                   creationDate: Long,
+                  size: Option[Long],
                   details: JsValue = Json.obj()
                   ) {
-  def this(name: String, filePath: String, creationDate: Long) =
-    this(BSONObjectID.generate.stringify, name, filePath, creationDate)
+//  def this(name: String, filePath: String, creationDate: Long, size: Long) =
+//    this(BSONObjectID.generate.stringify, name, filePath, creationDate, Some(size))
 
   override def equals(that: Any): Boolean = {
     that.isInstanceOf[Movie] && (this.hashCode() == that.asInstanceOf[Movie].hashCode())

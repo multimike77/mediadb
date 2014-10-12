@@ -20,7 +20,12 @@ class FileService {
 
   private def filesToMovieList(files: Array[File]): Seq[Movie] = {
     val movies: Array[Movie] = files.map(file =>
-      new Movie(stripExtension(file.getName), file.getCanonicalPath, file.lastModified()))
+      Movie(
+        name = stripExtension(file.getName),
+        filePath = file.getCanonicalPath,
+        creationDate = file.lastModified(),
+        size = if (file.isFile) Some(file.length()) else None)
+    )
     movies.toSeq
   }
 
