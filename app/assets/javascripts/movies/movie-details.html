@@ -5,32 +5,39 @@
     <li class="active">{{ movie.name}}</li>
 </ol>
 -->
-<div class="row movie-details">
-    <div class="col-md-4">
-        <img ng-if="movie.details.poster_path !== undefined && movie.details.poster_path != null"
-             ng-src="/images/w342/{{ movie.details.poster_path }}"/>
+<div class="container-fluid container-movie-details"
+     ng-style="backgroundImg">
+    <div class="movie-details">
+        <div class="row">
+            <div class="col-md-2 col-md-offset-1">
+                <img ng-if="movie.details.poster_path !== undefined && movie.details.poster_path != null"
+                     ng-src="/images/w185{{ movie.details.poster_path }}"/>
 
-        <img ng-if="movie.details.poster_path === undefined || movie.details.poster_path === null"
-             src="/assets/images/movie-film-roll.jpg" ng-cloak/>
-    </div>
-    <div class="col-md-8">
-        <h3>{{ movie.details.title || movie.name}}</h3>
+                <img ng-if="movie.details.poster_path === undefined || movie.details.poster_path === null"
+                     src="/assets/images/movie-film-roll.jpg" ng-cloak/>
+            </div>
+            <div class="col-md-7">
+                <h3>{{ movie.details.title || movie.name}}</h3>
 
-        <div class="movie-description">{{ movie.details.overview}}</div>
-        <div><span class="movie-info">Veröffentlichung:</span>
-            {{ movie.details.release_date | date: "dd.MM.yyyy" }}</div>
-        <div><span class="movie-info">Laufzeit:</span> {{movie.details.runtime}} Minuten</div>
-        <div><span class="movie-info">Bewertung:</span>
-            {{ movie.details.vote_average }} / 10 ({{ movie.details.vote_count }} Stimmen)</div>
-        <div><span class="movie-info">Genres:</span>
-            <span ng-repeat="genre in movie.details.genres">{{ genre.name }} {{ !$last ? ' / ' : ''}}</span>
-        </div>
-        <div class="download">
-            <a class="btn btn-default" ng-href="{{ movie.filePath }}" target="_self">
-                <span class="glyphicon glyphicon-download-alt"></span>
-                Download
-            </a>
+                <div class="movie-description">{{ movie.details.overview}}</div>
+                <div><span class="movie-info">Veröffentlichung:</span>
+                    {{ movie.details.release_date | date: "dd.MM.yyyy" }}</div>
+                <div><span class="movie-info">Laufzeit:</span> {{movie.details.runtime}} Minuten</div>
+                <div><span class="movie-info">Bewertung:</span>
+                    {{ movie.details.vote_average }} / 10 ({{ movie.details.vote_count }} Stimmen)</div>
+                <div><span class="movie-info">Genres:</span>
+                    <span ng-repeat="genre in movie.details.genres">{{ genre.name }} {{ !$last ? ' / ' : ''}}</span>
+                </div>
+                <div><span class="movie-info">Dateigröße:</span>
+                    {{ movie.size | fileSize: 2}}
+                </div>
+                <div class="download">
+                    <a class="btn btn-default" ng-href="{{ movie.filePath }}" target="_self">
+                        <span class="glyphicon glyphicon-download-alt"></span>
+                        Download
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-

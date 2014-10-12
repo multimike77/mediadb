@@ -34,6 +34,9 @@ define([], function () {
             data.filePath = helper.getDownloadPath(data.filePath);
             console.log(data);
             $scope.movie = data;
+            $scope.backgroundImg = {background: 'url(/images/w1280' +
+                data.details.backdrop_path +
+                ') no-repeat fixed 50% 0'};
         });
     };
     MovieDetailsCtrl.$inject = ['$scope', '$rootScope', '$location', 'helper', '$http', '$routeParams'];

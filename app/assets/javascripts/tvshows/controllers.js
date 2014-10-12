@@ -24,6 +24,9 @@ define(['angular'], function (angular) {
             console.log(data);
             data.details.status = getTVShowStatus(data.details.status);
             $scope.tvShow = data;
+            $scope.backgroundImg = {background: 'url(/images/w1280' +
+                data.details.backdrop_path +
+                ') no-repeat fixed 50% 0'};
 
             $http.get(path + '/episodes').success(function(data) {
                 angular.forEach(data, function(season) {

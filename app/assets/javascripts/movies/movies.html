@@ -1,35 +1,35 @@
-<h1>Filme</h1>
+<div class="container">
+    <h1>Filme</h1>
 
-
-
-        <form class="form-horizontal" role="form">
+    <form class="form-horizontal" role="form">
         <div class="form-group form-group-sm">
             <label for="sorting" class="col-sm-offset-9 col-sm-1 control-label">Sortierung</label>
             <div class="col-sm-2">
-            <select name="sorting" id="sorting" class="form-control input-sm" ng-model="sorting" ng-change="sortMovies()">
-                <option value="alpha">Alphabetisch</option>
-                <option value="added">Erstellungsdatum</option>
-            </select>
+                <select name="sorting" id="sorting" class="form-control input-sm" ng-model="sorting" ng-change="sortMovies()">
+                    <option value="alpha">Alphabetisch</option>
+                    <option value="added">Neueste zuerst</option>
+                </select>
             </div>
 
         </div>
-            </form>
+    </form>
 
 
-<div class="row" ng-repeat="row in movies">
+    <div class="row" ng-repeat="row in movies">
 
-    <div ng-repeat="movie in row" class="col-md-3">
-        <div class="thumbnail movie">
-            <a href="/movies/{{ movie.name }}">
-                <img ng-if="movie.details.poster_path !== undefined && movie.details.poster_path != null"
-                     ng-src="/images/w185/{{ movie.details.poster_path }}"/>
-                <img ng-if="movie.details.poster_path === undefined || movie.details.poster_path == null"
-                     src="/assets/images/blank_cover.png" class="movie-placeholder"/>
-            </a>
+        <div ng-repeat="movie in row" class="col-md-3">
+            <div class="thumbnail movie">
+                <a href="/movies/{{ movie.name }}">
+                    <img ng-if="movie.details.poster_path !== undefined && movie.details.poster_path != null"
+                         ng-src="/images/w185/{{ movie.details.poster_path }}"/>
+                    <img ng-if="movie.details.poster_path === undefined || movie.details.poster_path == null"
+                         src="/assets/images/blank_cover.png" class="movie-placeholder"/>
+                </a>
 
-            <div class="caption movie-caption">{{ movie.details.title || movie.name }}</div>
+                <div class="caption movie-caption">{{ movie.details.title || movie.name }}</div>
+            </div>
+
         </div>
 
     </div>
-
 </div>
