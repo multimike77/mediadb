@@ -8,8 +8,8 @@ organization := ""
 version := "0.0.1"
 
 // Scala Version, Play supports both 2.10 and 2.11
-scalaVersion := "2.10.4"
-//scalaVersion := "2.11.1"
+//scalaVersion := "2.10.4"
+scalaVersion := "2.11.2"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -24,10 +24,10 @@ libraryDependencies ++= Seq(
   "org.webjars" % "requirejs" % "2.1.11-1",
   "org.webjars" % "underscorejs" % "1.6.0-3",
   "org.webjars" % "jquery" % "1.11.1",
-  "org.webjars" % "bootstrap" % "3.1.1-1" exclude("org.webjars", "jquery"),
-  "org.webjars" % "angularjs" % "1.2.16-2" exclude("org.webjars", "jquery"),
-  "org.reactivemongo" %% "reactivemongo" % "0.10.0",
-  "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.akka23-SNAPSHOT",
+//  "org.webjars" % "bootstrap" % "3.1.1-1" exclude("org.webjars", "jquery"),
+  "org.webjars" % "angularjs" % "1.2.26" exclude("org.webjars", "jquery"),
+  "org.reactivemongo" %% "reactivemongo" % "0.10.5.0.akka23",
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23",
   "com.google.inject" % "guice" % "3.0",
   "javax.inject" % "javax.inject" % "1",
   "org.webjars" % "bootswatch-superhero" % "3.2.0"
@@ -82,3 +82,5 @@ RjsKeys.paths += ("jsRoutes" -> ("/jsroutes" -> "empty:"))
 // JavaScript linting with sbt-jshint (https://github.com/sbt/sbt-jshint)
 // ~~~
 // JshintKeys.config := ".jshintrc"
+
+doc in Compile <<= target.map(_ / "none")
