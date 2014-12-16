@@ -58,32 +58,38 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
     }
   }
 
+  /**
+   * Synchronize TV Shows in file system with DB: Add entries in DB for new shows, delete shows from DB which do not
+   * exist any more in file system
+   * @return JSON response with the sync result
+   */
   def syncDbWithFiles = Action.async {
     val futureSync: Future[MovieSyncResult] = findAllNewAndDeleted
     futureSync.map { result =>
-      for (movie <- result.addedMovies) {
-        collection.insert(movie).map { lastError =>
-          val msg = "Success: " + lastError.ok.toString + " added: " + movie.name
-          logger.info(msg)
-          if (!lastError.ok) {
+      //TODO DB error handling
+      result.addedMovies.foreach { movie =>
+        collection.insert(movie)
+      }
 
-          }
-        }
+      result.deletedMovies.foreach{ movie =>
+        collection.remove(Json.obj("name" -> movie.name))
       }
-      for (movie <- result.deletedMovies) {
-        collection.remove(Json.obj("name" -> movie.name)).map { lastError =>
-          val msg = "Success: " + lastError.ok.toString + " deleted: " + movie.name
-          logger.info(msg)
-        }
-      }
-      Ok("Synchronizing db with filesystem")
+
+      Ok(Json.obj(
+        "added" -> result.addedMovies,
+        "deleted" -> result.deletedMovies
+      ))
     }
   }
 
+  /**
+   * Fetch details from TMDB for shows which have no details yet in DB
+   * @return Ok response
+   */
   def loadMissingShowDetails = Action.async {
     val toBeUpdated: Future[Seq[Movie]] = showsWithoutDetails
     toBeUpdated.map { shows =>
-      for (show <- shows) {
+      shows.foreach { show =>
         mdb.searchTVShow(show.name).map { searchRes =>
           val showId = (searchRes \ "results")(0) \ "id"
           if (showId.isInstanceOf[JsNumber]) {
@@ -91,8 +97,7 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
               val oid = Json.obj("_id" -> Json.obj("$oid" -> show.id))
               val details = Json.obj("$set" -> Json.obj("details" -> showDetails))
               collection.update(oid, details).map { lastError =>
-                val msg = "Success: " + lastError.ok.toString + " updated: " + show.name
-                logger.info(msg)
+                logger.info(s"${lastError.ok}, updated: ${show.name}")
               }
             }
           }
@@ -108,6 +113,11 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
     }
   }
 
+  /**
+   * Load details for one show from DB
+   * @param name The name of the TV Show
+   * @return JSON response with details or error if no entries found
+   */
   def tvShowDetails(name: String) = Action.async {
     val fm: Future[Option[Movie]] = collection.find(Json.obj("name" -> name)).one
 
@@ -147,6 +157,11 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
     }
   }
 
+  /**
+   * Grab details for a single movie from TMDB and update the entry in local DB
+   * @param id ID of the movie in TMDB
+   * @return JSON with the movie details retrieved
+   */
   def updateDetails(id: String) = Action.async { request =>
     request.getQueryString("tmdbid") match {
       case None => Future {
@@ -157,8 +172,7 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
           val oid = Json.obj("_id" -> Json.obj("$oid" -> id))
           val details = Json.obj("$set" -> Json.obj("details" -> md))
           collection.update(oid, details).map { lastError =>
-            val msg = "Success: " + lastError.ok.toString + " updated: " + id
-            logger.info(msg)
+            logger.info(s"Status: ${lastError.ok}, updated $id ")
           }
           Ok(details)
         }

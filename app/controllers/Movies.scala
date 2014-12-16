@@ -98,44 +98,50 @@ class Movies @Inject()(fileService: FileService, mdb: MovieDBService) extends Co
     }
   }
 
-
+  /**
+   * Synchronize movies in file system with DB: Add entries in DB for new shows, delete movies from DB which do not
+   * exist any more in file system
+   * @return JSON response with the sync result
+   */
   def syncDbWithFiles = Action.async {
     val futureSync: Future[MovieSyncResult] = findAllNewAndDeleted
     futureSync.map { result =>
-      for (movie <- result.addedMovies) {
-        collection.insert(movie).map { lastError =>
-          val msg = "Success: " + lastError.ok.toString + " added: " + movie.name
-          logger.info(msg)
-          if (!lastError.ok) {
+      //TODO DB error handling
+      result.addedMovies.foreach { movie =>
+        collection.insert(movie)
+      }
 
-          }
-        }
+      result.deletedMovies.foreach{ movie =>
+        collection.remove(Json.obj("name" -> movie.name))
       }
-      for (movie <- result.deletedMovies) {
-        collection.remove(Json.obj("name" -> movie.name)).map { lastError =>
-          val msg = "Success: " + lastError.ok.toString + " deleted: " + movie.name
-          logger.info(msg)
-        }
-      }
-      Ok("syncing movies")
+
+      Ok(Json.obj(
+        "added" -> result.addedMovies,
+        "deleted" -> result.deletedMovies
+      ))
     }
   }
 
+  /**
+   * Fetch details from TMDB for movies which have no details yet in DB
+   * @return Ok response
+   */
   def loadMissingMovieDetails = Action.async {
     val toBeUpdated: Future[Seq[Movie]] = moviesWithoutDetails
     toBeUpdated.map { movies =>
-      for (movie <- movies) {
+      movies.foreach { movie =>
         mdb.searchMovie(movie.name).map { searchRes =>
-          logger.info(movie.name + searchRes.toString())
+          logger.debug(s"${movie.name}: $searchRes")
+
           //TODO handle selection for multiple results
           val movieId = (searchRes \ "results")(0) \ "id"
           if (movieId.isInstanceOf[JsNumber]) {
-            mdb.loadMovieDetails(movieId.as[Int], "de").map { movieDetails =>
+            mdb.loadMovieDetails(movieId.as[Int], "de").map { mdbDetails =>
               val oid = Json.obj("_id" -> Json.obj("$oid" -> movie.id))
-              val details = Json.obj("$set" -> Json.obj("details" -> movieDetails))
+              val details = Json.obj("$set" -> Json.obj("details" -> mdbDetails))
+
               collection.update(oid, details).map { lastError =>
-                val msg = "Success: " + lastError.ok.toString + " updated: " + movie.name
-                logger.info(msg)
+                logger.info(s"${lastError.ok}, updated: ${movie.name}")
               }
             }
           }
@@ -145,7 +151,11 @@ class Movies @Inject()(fileService: FileService, mdb: MovieDBService) extends Co
     }
   }
 
-  
+  /**
+   * Load details for one movie from DB
+   * @param name The name of the movie
+   * @return JSON response with details or error if no entries found
+   */
   def loadMovieDetails(name: String) = Action.async {
     val fm: Future[Option[Movie]] = collection.find(Json.obj("name" -> name)).one
 
@@ -155,6 +165,11 @@ class Movies @Inject()(fileService: FileService, mdb: MovieDBService) extends Co
     }
   }
 
+  /**
+   * Grab details for a single movie from TMDB and update the entry in local DB
+   * @param id ID of the movie in TMDB
+   * @return JSON with the movie details retrieved
+   */
   def updateDetails(id: String) = Action.async { request =>
     request.getQueryString("tmdbid") match {
       case None => Future {BadRequest("tmdbId not specified")}
@@ -163,8 +178,7 @@ class Movies @Inject()(fileService: FileService, mdb: MovieDBService) extends Co
           val oid = Json.obj("_id" -> Json.obj("$oid" -> id))
           val details = Json.obj("$set" -> Json.obj("details" -> md))
           collection.update(oid, details).map { lastError =>
-            val msg = "Success: " + lastError.ok.toString + " updated: " + id
-            logger.info(msg)
+            logger.info(s"Status: ${lastError.ok}, updated $id ")
           }
           Ok(details)
         }
