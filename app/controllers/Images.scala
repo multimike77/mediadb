@@ -47,6 +47,7 @@ class Images extends Controller {
     val futureResponse = WS.url(imageUrl).getStream()
     val downloadedFile: Future[File] = futureResponse.flatMap {
       case (headers, body) =>
+        if (! image.getParentFile.exists) image.getParentFile.mkdirs
         val outputStream = new FileOutputStream(image)
 
         // The iteratee that writes to the output stream
