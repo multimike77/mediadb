@@ -159,7 +159,8 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
 
   /**
    * Grab details for a single movie from TMDB and update the entry in local DB
-   * @param id ID of the movie in TMDB
+   * External TMDB id must be supplied by request param 'tmdbid'
+   * @param id internal movie id
    * @return JSON with the movie details retrieved
    */
   def updateDetails(id: String) = Action.async { request =>
