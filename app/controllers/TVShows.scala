@@ -75,6 +75,8 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
         collection.remove(Json.obj("name" -> movie.name))
       }
 
+      updateCreationDate()
+
       Ok(Json.obj(
         "added" -> result.addedMovies,
         "deleted" -> result.deletedMovies
@@ -128,16 +130,6 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
     }
   }
 
-/* old version
-  def listEpisodes(tvShowName: String, seasonNumber: Int) = Action { implicit request =>
-    request.getQueryString("fp") match {
-      case Some(path) =>
-        val episodes: Seq[Movie] = fs.getTVShowEpisodes(path, seasonNumber)
-        Ok(Json.toJson(episodes))
-      case None => NotFound
-    }
-  }
-*/
 
   def listEpisodes(tvShowName: String) = Action.async {
     val fm: Future[Option[Movie]] = collection.find(Json.obj("name" -> tvShowName)).one
@@ -177,6 +169,21 @@ class TVShows @Inject()(fs: FileService, mdb: MovieDBService) extends Controller
           }
           Ok(details)
         }
+    }
+  }
+
+  private def updateCreationDate() = {
+    val tvShows = allShowsFromDB
+    tvShows.map {fm =>
+      fm.foreach {show =>
+        fs.getNewestEpisodeDate(show.filePath) foreach { timestamp =>
+          val oid = Json.obj("_id" -> Json.obj("$oid" -> show.id))
+          val creationDate = Json.obj("$set" -> Json.obj("creationDate" -> timestamp))
+          collection.update(oid, creationDate).map { lastError =>
+            logger.info(s"Update creationDate: ${lastError.ok}, updated: $oid, ${show.name}")
+          }
+        }
+      }
     }
   }
 

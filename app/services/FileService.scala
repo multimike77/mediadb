@@ -4,6 +4,7 @@ import java.io.File
 import javax.inject.Singleton
 
 import models.Movie
+import org.slf4j.{LoggerFactory, Logger}
 import play.api.libs.json.{JsValue, Json, Writes}
 
 import scala.util.matching.Regex
@@ -11,11 +12,18 @@ import scala.util.matching.Regex
 
 @Singleton
 class FileService {
+  private final val logger: Logger = LoggerFactory.getLogger("movies")
+  val episodePattern = ".*\\.(mkv|mp4|m4v|avi)$".r
 
   private def recursiveListFiles(dir: File, pattern: Regex): Array[File] = {
-    val files = dir.listFiles
-    val good = files.filter(f => pattern.findFirstIn(f.getName).isDefined)
-    good ++ files.filter(f => f.isDirectory && !f.isHidden).flatMap(recursiveListFiles(_, pattern))
+    if (dir.exists() && dir.isDirectory) {
+      val files = dir.listFiles
+      val good = files.filter(f => pattern.findFirstIn(f.getName).isDefined)
+      good ++ files.filter(f => f.isDirectory && !f.isHidden).flatMap(recursiveListFiles(_, pattern))
+    } else {
+      logger.warn(s"Invalid directory: ${dir.getName}")
+      Array.empty
+    }
   }
 
   private def filesToMovieList(files: Array[File]): Seq[Movie] = {
@@ -54,12 +62,26 @@ class FileService {
   def getTVShowEpisodes(path: String, seasonNumber: Int): Seq[Movie] = {
     val tvShowDir = new File(path)
     val seasonPattern = ("Season[\\s]?" + seasonNumber.toString).r
-    val episodePattern = ".*\\.(mkv|mp4|m4v|avi)$".r
     val seasonDir = getAllSubDirectories(tvShowDir).find(dir => seasonPattern.findFirstIn(dir.getName).isDefined)
 
     val episodes = seasonDir.map(recursiveListFiles(_, episodePattern)).map(filesToMovieList)
     episodes.getOrElse(Seq[Movie]())
   }
+
+  /**
+   * Scan through all episodes of a tv show and return the file creation date of the newest episode
+   * @param path Path to tv show
+   * @return timestamp of the newest episode or <code>None</code>
+   */
+  def getNewestEpisodeDate(path: String): Option[Long] = {
+    val tvShowDir = new File(path)
+    val episodes: Array[File] = recursiveListFiles(tvShowDir, episodePattern)
+    if (episodes.nonEmpty) {
+      val newestEpisode = episodes.reduceLeft((x, y) => if (x.lastModified > y.lastModified) x else y)
+      Some(newestEpisode.lastModified())
+    } else None
+  }
+
 }
 
 
