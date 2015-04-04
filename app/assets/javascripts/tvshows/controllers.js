@@ -5,15 +5,25 @@ define(['angular'], function (angular) {
     'use strict';
 
     /** Controls the tv shows page */
-    var TVShowCtrl = function ($scope, $rootScope, $location, helper, $http) {
+    var TVShowCtrl = function ($scope, $rootScope, $location, helper, $http, $filter) {
         $rootScope.pageTitle = 'Serien';
+        $scope.sorting = 'added';
+        var shows = [];
+        var orderBy = $filter('orderBy');
+
+        $scope.sortMovies = function() {
+            var sortField = $scope.sorting === 'alpha' ? 'details.title' : '-creationDate';
+            var sortedMovies = orderBy(shows, sortField, false);
+            $scope.tvshows = helper.partitionArray(sortedMovies, 4);
+        };
 
         $http.get('/api/tv/list').success(function (data) {
-            $scope.tvshows = helper.partitionArray(data, 4);
+            shows = data;
+            $scope.sortMovies();
         });
     };
 
-    TVShowCtrl.$inject = ['$scope', '$rootScope', '$location', 'helper', '$http'];
+    TVShowCtrl.$inject = ['$scope', '$rootScope', '$location', 'helper', '$http', '$filter'];
 
     var TVShowDetailsCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams) {
         var tvShowName = $routeParams.showName;

@@ -1,5 +1,17 @@
 <div class="container">
 <h1>Serien</h1>
+<form class="form-horizontal" role="form">
+    <div class="form-group form-group-sm">
+        <label for="sorting" class="col-sm-offset-9 col-sm-1 control-label">Sortierung</label>
+        <div class="col-sm-2">
+            <select name="sorting" id="sorting" class="form-control input-sm" ng-model="sorting" ng-change="sortMovies()">
+                <option value="alpha">Alphabetisch</option>
+                <option value="added">Neueste zuerst</option>
+            </select>
+        </div>
+
+    </div>
+</form>
 <div class="row" ng-repeat="row in tvshows">
     <div ng-repeat="show in row" class="col-xs-6 col-md-3">
         <div class="thumbnail series">
